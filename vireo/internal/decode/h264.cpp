@@ -100,7 +100,7 @@ H264::H264(const functional::Video<Sample>& track, uint32_t thread_count) {
   const auto& sps_pps = settings.sps_pps;
   auto extradata = sps_pps.as_extradata(header::SPS_PPS::iso);
   THROW_IF(extradata.count() > security::kMaxHeaderSize * 2, Unsafe);
-  const uint16_t padded_size = (size_t)extradata.count() + FF_INPUT_BUFFER_PADDING_SIZE;
+  const uint16_t padded_size = (size_t)extradata.count() + AV_INPUT_BUFFER_PADDING_SIZE;
   common::Data16 extradata_padded = { (const uint8_t*)calloc(padded_size, sizeof(uint8_t)), padded_size, [](uint8_t* p) { free(p); } };
   extradata_padded.copy(extradata);
 

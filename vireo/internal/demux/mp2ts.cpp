@@ -77,7 +77,7 @@ struct ADTSHeader {
 
 struct _MP2TS {
   common::Reader reader;
-  common::Data32 iobuffer = common::Data32((uint8_t*)av_malloc(kSize_Buffer + FF_INPUT_BUFFER_PADDING_SIZE), kSize_Buffer + FF_INPUT_BUFFER_PADDING_SIZE, [](uint8_t*p){ av_free(p); });
+  common::Data32 iobuffer = common::Data32((uint8_t*)av_malloc(kSize_Buffer + AV_INPUT_BUFFER_PADDING_SIZE), kSize_Buffer + AV_INPUT_BUFFER_PADDING_SIZE, [](uint8_t*p){ av_free(p); });
   unique_ptr<AVFormatContext, function<void(AVFormatContext*)>> format_context = { nullptr, [](AVFormatContext* p) {
     if (p->pb) {
       av_free(p->pb);

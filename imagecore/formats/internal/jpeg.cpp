@@ -222,11 +222,11 @@ boolean ImageReaderJPEG::handleJPEGMarker(j_decompress_ptr dinfo)
 	uint8_t* segmentData = (uint8_t*)malloc(segmentLength);
 	if( segmentData == NULL ) {
 		reader->m_MarkerReadError = true;
-		return FALSE;
+		return (boolean)FALSE;
 	}
 	jpegRead(dinfo, segmentData, segmentLength);
 	reader->processJPEGSegment(dinfo->unread_marker, segmentData, segmentLength);
-	return TRUE;
+	return (boolean)TRUE;
 }
 
 void ImageReaderJPEG::processJPEGSegment(unsigned int marker, uint8_t* segmentData, unsigned int segmentLength)
@@ -248,7 +248,7 @@ bool ImageReaderJPEG::readHeader()
 		return false;
 	}
 
-	jpeg_read_header(&m_JPEGDecompress, TRUE);
+	jpeg_read_header(&m_JPEGDecompress, (boolean)TRUE);
 
 	if( m_MarkerReadError ) {
 		return false;
@@ -334,13 +334,13 @@ bool ImageReaderJPEG::beginReadInternal(unsigned int destWidth, unsigned int des
 	m_JPEGDecompress.dct_method = JDCT_ISLOW;
 
 	if( (m_ReadOptions & kReadOption_DecompressQualityFast) != 0) {
-		m_JPEGDecompress.do_fancy_upsampling = FALSE;
+		m_JPEGDecompress.do_fancy_upsampling = (boolean)FALSE;
 		m_JPEGDecompress.dct_method = JDCT_FASTEST;
-		m_JPEGDecompress.do_block_smoothing = FALSE;
+		m_JPEGDecompress.do_block_smoothing = (boolean)FALSE;
 	}
 
 	if( destColorModel == kColorModel_YUV_420 ) {
-		m_JPEGDecompress.raw_data_out = TRUE;
+		m_JPEGDecompress.raw_data_out = (boolean)TRUE;
 	}
 
 	if( setjmp(m_JPEGError.jmp) ) {
@@ -776,7 +776,7 @@ boolean ImageReaderJPEG::SourceManager::fillInputBuffer(j_decompress_ptr cinfo)
 	self->bytes_in_buffer = nbytes;
 	self->startOfFile = false;
 
-	return TRUE;
+	return (boolean)TRUE;
 }
 
 void ImageReaderJPEG::SourceManager::skipInputData(j_decompress_ptr cinfo, long numBytes)
@@ -911,17 +911,17 @@ bool ImageWriterJPEG::beginWrite(unsigned int width, unsigned int height, EImage
 	}
 
 	jpeg_set_defaults(&m_JPEGCompress);
-	jpeg_set_quality(&m_JPEGCompress, m_Quality, TRUE);
+	jpeg_set_quality(&m_JPEGCompress, m_Quality, (boolean)TRUE);
 	jpeg_set_colorspace(&m_JPEGCompress, JCS_YCbCr);
 
 	if( m_QuantTables != NULL ) {
-		jpeg_add_quant_table(&m_JPEGCompress, 0, m_QuantTables, 100, TRUE);
-		jpeg_add_quant_table(&m_JPEGCompress, 1, m_QuantTables + DCTSIZE2, 100, TRUE);
+		jpeg_add_quant_table(&m_JPEGCompress, 0, m_QuantTables, 100, (boolean)TRUE);
+		jpeg_add_quant_table(&m_JPEGCompress, 1, m_QuantTables + DCTSIZE2, 100, (boolean)TRUE);
 	}
 
 	if( (m_WriteOptions & kWriteOption_QualityFast) == 0 ) {
 		// Compressing takes about 50% longer with this on, but produces files a few percent smaller.
-		m_JPEGCompress.optimize_coding = TRUE;
+		m_JPEGCompress.optimize_coding = (boolean)TRUE;
 	}
 
 	// This makes more of a difference than the documentation suggests, and it's not really slower (faster in some tests).
@@ -948,14 +948,14 @@ bool ImageWriterJPEG::beginWrite(unsigned int width, unsigned int height, EImage
 			m_JPEGCompress.comp_info[0].v_samp_factor = 2;
 		}
 	} else if( colorModel == kColorModel_YUV_420 ) {
-		m_JPEGCompress.raw_data_in = TRUE;
+		m_JPEGCompress.raw_data_in = (boolean)TRUE;
 		m_JPEGCompress.comp_info[0].h_samp_factor = 2;
 		m_JPEGCompress.comp_info[0].v_samp_factor = 2;
 	} else {
 		SECURE_ASSERT(0);
 	}
 
-	jpeg_start_compress(&m_JPEGCompress, TRUE);
+	jpeg_start_compress(&m_JPEGCompress, (boolean)TRUE);
 
 	if( !writeMarkers() ) {
 		jpeg_destroy_compress(&m_JPEGCompress);
@@ -1344,11 +1344,11 @@ boolean ImageWriterJPEG::DestinationManager::emptyOutputBuffer(j_compress_ptr ci
 	ImageWriterJPEG::DestinationManager* dest = (ImageWriterJPEG::DestinationManager*)cinfo->dest;
 	uint64_t written = dest->storage->write(dest->m_Buffer, kWriteBufferSize);
 	if( written < kWriteBufferSize ) {
-		return FALSE;
+		return (boolean)FALSE;
 	}
 	dest->next_output_byte = dest->m_Buffer;
 	dest->free_in_buffer = kWriteBufferSize;
-	return TRUE;
+	return (boolean)TRUE;
 }
 
 void ImageWriterJPEG::DestinationManager::termDestination(j_compress_ptr cinfo)

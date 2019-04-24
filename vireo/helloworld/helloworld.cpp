@@ -42,9 +42,12 @@ void remux(string in, string out) {
   cout << "Remuxing " << in << " to " << out << endl;
   // setup the demux -> mux pipeline
   demux::Movie movie(in);
+  cout << "step 1" << endl;
   mux::MP4 muxer(movie.video_track);
+  cout << "step 2" << endl;
   // nothing is executed until muxer() is called
   auto binary = muxer();
+  cout << "step 3" << endl;
   // save to file
   util::save(out, binary);
   cout << "Done" << endl;
